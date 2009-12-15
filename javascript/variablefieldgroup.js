@@ -18,7 +18,7 @@
 					}else{
 						group.prepend($(data).hide());
 					}
-					group.find('> div.loadingimage').hide();
+					group.find('div.loadingimage').hide();
 					group.find('> .CompositeField:last').slideDown();
 				}
 			});
