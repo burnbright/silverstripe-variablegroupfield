@@ -13,13 +13,13 @@
 					group.find('div.loadingimage').show();
 				},
 				success: function(data){
-					if(group.find('.CompositeField:last').size() > 0){
-						group.find('.CompositeField:last').after($(data).hide());
+					if(group.find('> .CompositeField:last').size() > 0){
+						group.find('> .CompositeField:last').after($(data).hide());
 					}else{
 						group.prepend($(data).hide());
 					}
-					group.find('div.loadingimage').hide();
-					group.find('.CompositeField:last').slideDown();
+					group.find('> div.loadingimage').hide();
+					group.find('> .CompositeField:last').slideDown();
 				}
 			});
 			return false;
@@ -32,7 +32,7 @@
 					url: $(this).attr('href'),
 					dataType: "html",
 					success: function(data){
-						group.find('.CompositeField:last').slideUp(600,function(){$(this).remove();});
+						group.find('> .CompositeField:last').slideUp(600,function(){$(this).remove();});
 					}
 				});
 			//}
