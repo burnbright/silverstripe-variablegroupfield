@@ -218,7 +218,6 @@ class VariableGroupField extends CompositeField{
 	 */
 	function saveInto(DataObjectInterface $record) {
 		if($this->name) {
-			//$record->setCastedField($this->name, $this->dataValue()); //origional code
 
 			$class = $record->has_many($this->name);
 			foreach($this->FieldSet() as $compositefield){
@@ -236,6 +235,7 @@ class VariableGroupField extends CompositeField{
 					$dataobject->write();
 				}
 			}
+			
 		}
 		//TODO: clear session init count
 	}
@@ -254,5 +254,24 @@ class VariableGroupField extends CompositeField{
 		}
 	}
 
+	/**
+	 * Returns data as a DataObjectSet (very similar to saveInto)
+	 */
+	function getDataObjectSet(){
+		$dos = new DataObjectSet();
+		foreach($this->FieldSet() as $compositefield){
+			$dataobject = new DataObject();
+			foreach($compositefield->FieldSet() as $field){
+				$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name
+				if($field->hasData()){
+					$field->saveInto($dataobject);
+				}elseif($field->isComposite()){
+					$this->recursiveSaveInto($field,$dataobject); //save into composite sub-fields
+				}
+			}
+			$dos->push($dataobject);
+		}
+		return $dos;
+	}
 }
 ?>
