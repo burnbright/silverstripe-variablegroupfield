@@ -44,7 +44,7 @@ class VariableGroupTest extends Page_Controller{
 		$data = $vgf->getDataObjectSet();
 		return array(
 			'Data' => $data,
-			'Content' => 'Here is what you entered:',
+			'Content' => '<p>Here is what you entered. This data was retrieved from the VariableGroupField\'s getDataObjectSet function.</p>',
 			'Form' => ''
 		);
 	}
