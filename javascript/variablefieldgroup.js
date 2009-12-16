@@ -13,13 +13,33 @@
 					group.find('div.loadingimage').show();
 				},
 				success: function(data){
-					if(group.find('> .CompositeField:last').size() > 0){
-						group.find('> .CompositeField:last').after($(data).hide());
+					var size = group.find('> .CompositeField').size();
+					
+					if(group.find('> .CompositeField:last').length){
+						
+						group.find('> .CompositeField:last').after($(data).hide()); //insert new fields
+						
+						//copy values over to new field
+						group.find('> .CompositeField:eq('+(size-1)+')').find('.duplicateme:input').each(function(){
+							var name = $(this).attr('name')
+							var newname = name.substring(0,name.indexOf('_'));
+							var value = $(this).val();
+							
+							
+							if($(this).attr('checked')){
+								group.find('> .CompositeField:last').find('.'+newname+':input').attr('checked',true);
+							}else{
+								group.find('> .CompositeField:last').find('.'+newname+':input').val(value);
+							}
+							//TODO: make this work with radio buttons & dropdowns etc
+							
+						});
+						
 					}else{
 						group.prepend($(data).hide());
 					}
 					group.find('div.loadingimage').hide();
-					group.find('> .CompositeField:last').slideDown();
+					group.find('> .CompositeField:last').slideDown();					
 				}
 			});
 			return false;

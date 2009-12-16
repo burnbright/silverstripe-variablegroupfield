@@ -10,13 +10,16 @@ class VariableGroupField extends CompositeField{
 	
 	//TODO: load data from dataobjectset capability
 	
+	protected $originalchildren = null;
+	
 	//configuration options
 	protected $initcount = 1;
-	protected $origfieldgroup = null;
 	protected $showfieldscount = false;
 	protected $loadingimageurl = null;
 	protected $fieldstoduplicate = null;
 	protected $writeonsave = true;
+	
+	protected $singularitem = null;
 	
 	/**
 	 * The constructor will generate $initcount number of field groups.
@@ -54,10 +57,17 @@ class VariableGroupField extends CompositeField{
 		parent::__construct($args);
 		
 		//duplicate child fields as necessary
-		$this->origfieldgroup = unserialize(serialize($this->children));
+		$this->originalchildren = unserialize(serialize($this->children));
 		$this->generateFields();
 		
 		Requirements::javascript('variablegroupfield/javascript/variablefieldgroup.js');
+	}
+	
+	/**
+	 * Add a new child field to the end of the set.
+	 */
+	public function push(FormField $field) {
+		$this->originalchildren->push($field);
 	}
 	
 	/**
@@ -74,6 +84,10 @@ class VariableGroupField extends CompositeField{
 	 */
 	function setLoadingImageURL($i){
 		$this->loadingimageurl = $i;
+	}
+	
+	function setSinglularItem($s){
+		$this->singularitem = $s;
 	}
 	
 	/**
@@ -117,8 +131,9 @@ class VariableGroupField extends CompositeField{
 		if($this->loadingimageurl){
 			$content .= "<div class='loadingimage' style='display:none;'><img src='".$this->loadingimageurl."' /></div>";
 		}
-		$content .= "<a href=\"".$this->AddLink()."\" class=\"addlink\" >+ add</a>\n";
-		$content .= "<a href=\"".$this->RemoveLink()."\" class=\"removelink\" />- remove</a>\n";
+		$itemname = ($this->singularitem)? " ".$this->singularitem:"";
+		$content .= "<a href=\"".$this->AddLink()."\" class=\"addlink\" >+ add$itemname</a>\n";
+		$content .= "<a href=\"".$this->RemoveLink()."\" class=\"removelink\" />- remove$itemname</a>\n";
 		$content .= "</div></div>\n";
 		return $content;
 	}
@@ -129,6 +144,10 @@ class VariableGroupField extends CompositeField{
 	
 	function RemoveLink() {
 		return $this->Link() . "/remove";
+	}
+	
+	function test($data = null, $form = null){
+		return "test";
 	}
 	
 	/**
@@ -174,11 +193,14 @@ class VariableGroupField extends CompositeField{
 	 */
 	
 	function generateFieldGroup($i){
-		$newfields = new CompositeField( unserialize(serialize($this->origfieldgroup)));
+		$newfields = new CompositeField( unserialize(serialize($this->originalchildren)));
 		foreach($newfields->FieldSet() as $subfield){
 			$subfield->addExtraClass($subfield->Name());
 			if($this->showfieldscount){
 				$subfield->setTitle($subfield->Title()." ".$i);
+			}
+			if($this->fieldstoduplicate && in_array($subfield->Name(),$this->fieldstoduplicate)){
+				$subfield->addExtraClass('duplicateme');
 			}
 			$subfield->setName($subfield->Name()."_".$i);
 			if($subfield->isComposite()){
@@ -200,10 +222,13 @@ class VariableGroupField extends CompositeField{
 			if($this->showfieldscount){
 				$subfield->setTitle($subfield->Title()." ".$i);
 			}
+			if($this->fieldstoduplicate && in_array($subfield->Name(),$this->fieldstoduplicate)){
+				$subfield->addExtraClass('duplicateme');
+			}
 			$subfield->setName($subfield->Name()."_".$i);
 			
 			if($subfield->isComposite()){
-				$subfield->setChildren($this->modifyFieldGroup($i,$subfield));
+				$this->modifyComposite($i,$subfield);
 			}			
 		}
 		if($field){
