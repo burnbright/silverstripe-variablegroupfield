@@ -51,8 +51,12 @@
 					type: "GET",
 					url: $(this).attr('href'),
 					dataType: "html",
+					beforeSend: function(){
+						group.find('div.loadingimage').show();
+					},
 					success: function(data){
 						group.find('> .CompositeField:last').slideUp(600,function(){$(this).remove();});
+						group.find('div.loadingimage').hide();
 					}
 				});
 			//}
