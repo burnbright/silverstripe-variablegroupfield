@@ -298,5 +298,35 @@ class VariableGroupField extends CompositeField{
 		}
 		return $dos;
 	}
+	
+	
+	
+	//TODO: maybe override the setValue function that is used in form->loadDataFrom ???
+	function loadDataFrom(DataObjectSet $dos){
+		
+		$iterator = $dos->getIterator();
+		
+		if($this->initcount < $dos->Count()){
+			$this->initcount = $dos->Count();
+		}
+		$this->generateFields();
+		$count = 0;
+		foreach($this->FieldSet() as $fieldgroup){
+			
+			if($iterator->current()){
+				$count++;
+				$data = $iterator->current()->toMap();
+				foreach($data as $key => $value){
+					$data[$key."_".$count] = $value; //TODO: make this a deep modification?
+				}
+				$fieldgroup->FieldSet()->setValues($data);
+				$iterator->next();
+			}
+			
+		}
+		
+	}
+	
+	
 }
 ?>
