@@ -13,7 +13,7 @@ class VariableGroupField extends CompositeField{
 	protected $originalchildren = null;
 	
 	//configuration options
-	protected $initcount = 1;
+	protected $groupcount = 1;
 	protected $showfieldscount = false;
 	protected $loadingimageurl = null;
 	protected $fieldstoduplicate = null;
@@ -22,25 +22,25 @@ class VariableGroupField extends CompositeField{
 	protected $singularitem = null;
 	
 	/**
-	 * The constructor will generate $initcount number of field groups.
+	 * The constructor will generate $groupcount number of field groups.
 	 * 
 	 */
-	public function __construct($name, $initcount = 1) {
+	public function __construct($name, $groupcount = 1) {
 		
 		$args = func_get_args();
 		
 		$name = array_shift($args);
-		$initcount = array_shift($args);
+		$groupcount = array_shift($args);
 		
 		if(!is_string($name)) user_error('TabSet::__construct(): $name parameter to a valid string', E_USER_ERROR);
 		$this->name = $name;
 	
 		
-		if(is_numeric(Session::get($this->name."_initcount"))){
-			 $this->initcount = Session::get($this->name."_initcount");
+		if(is_numeric(Session::get($this->name."_groupcount"))){
+			 $this->groupcount = Session::get($this->name."_groupcount");
 		}
-		elseif(is_numeric($initcount)){
-			$this->initcount = $initcount;
+		elseif(is_numeric($groupcount)){
+			$this->groupcount = $groupcount;
 		}
 			
 		$this->id = preg_replace('/[^0-9A-Za-z]+/', '', $name);
@@ -74,8 +74,9 @@ class VariableGroupField extends CompositeField{
 	 * Set the initial count of groups to show
 	 */
 	function setCount($count = null){
-		if($count){
-			$this->initcount = $count;
+		if($count && $count > 0){
+			$this->groupcount = $count;
+			Session::set($this->name."_groupcount",$this->groupcount);
 		}
 	}
 	
@@ -91,7 +92,7 @@ class VariableGroupField extends CompositeField{
 	}
 	
 	/**
-	 * Choose to not write on save
+	 * Choose to not write on save. Might be useful if you just want to use the dataobject output.
 	 */
 	function writeOnSave($wos = false){
 		$this->writeonsave = $wos;
@@ -154,10 +155,10 @@ class VariableGroupField extends CompositeField{
 	 * Increase the init count. Returns new field group if ajax.
 	 */
 	function add(){
-		$this->initcount++;
-		Session::set($this->name."_initcount",$this->initcount);
+		
+		$this->setCount($this->groupcount);
 		if(Controller::isAjax() || true){		
-			return $this->generateFieldGroup($this->initcount)->fieldHolder();
+			return $this->generateFieldGroup($this->groupcount)->fieldHolder();
 		}
 		//TODO: save form data to be loaded again?
 		//TODO: populate fields to be duplicated
@@ -169,9 +170,9 @@ class VariableGroupField extends CompositeField{
 	 * Decrease the init count.
 	 */
 	function remove(){
-		if($this->initcount > 0){
-			$this->initcount--;
-			Session::set($this->name."_initcount",$this->initcount);
+		if($this->groupcount > 0){
+			$this->groupcount--;
+			$this->setCount($this->groupcount);
 		}
 		Director::redirectBack();
 		return 'remove';
@@ -182,7 +183,7 @@ class VariableGroupField extends CompositeField{
 	 */
 	function generateFields(){
 		$returnfields = new FieldSet();		
-		for($i = 1; $i <= $this->initcount; $i++){
+		for($i = 1; $i <= $this->groupcount; $i++){
 			$returnfields->push($this->generateFieldGroup($i));
 		}
 		$this->children = $returnfields;	
@@ -207,7 +208,9 @@ class VariableGroupField extends CompositeField{
 				$this->modifyComposite($i,$subfield);
 			}
 		}
+		
 		$newfields->setName($this->name."_group_".$i);
+		
 		return $newfields;
 	}
 	
@@ -243,7 +246,6 @@ class VariableGroupField extends CompositeField{
 	 */
 	function saveInto(DataObjectInterface $record) {
 		if($this->name) {
-
 			$class = $record->has_many($this->name);
 			foreach($this->FieldSet() as $compositefield){
 				$dataobject = new $class();
@@ -306,8 +308,8 @@ class VariableGroupField extends CompositeField{
 		
 		$iterator = $dos->getIterator();
 		
-		if($this->initcount < $dos->Count()){
-			$this->initcount = $dos->Count();
+		if($this->groupcount < $dos->Count()){
+			$this->setCount($dos->Count());
 		}
 		$this->generateFields();
 		$count = 0;
