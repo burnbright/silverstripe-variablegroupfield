@@ -8,8 +8,6 @@
  */
 class VariableGroupField extends CompositeField{
 	
-	//TODO: load data from dataobjectset capability
-	
 	protected $originalchildren = null;
 	
 	//configuration options
@@ -78,6 +76,11 @@ class VariableGroupField extends CompositeField{
 			$this->groupcount = $count;
 			Session::set($this->name."_groupcount",$this->groupcount);
 		}
+	}
+	
+	function clearCount(){
+		Session::clear($this->name."_groupcount");
+		$this->groupcount = 1;
 	}
 	
 	/**
@@ -160,8 +163,8 @@ class VariableGroupField extends CompositeField{
 		if(Controller::isAjax() || true){		
 			return $this->generateFieldGroup($this->groupcount)->fieldHolder();
 		}
-		//TODO: save form data to be loaded again?
-		//TODO: populate fields to be duplicated
+		//TODO: save form data to be loaded again? (for non-javascript implementations)
+		//TODO: populate fields to be duplicated (currently done with javascript)
 		Director::redirectBack();
 		return 'added';
 	}
@@ -264,7 +267,8 @@ class VariableGroupField extends CompositeField{
 			}
 			
 		}
-		//TODO: clear session init count
+		//clear session init count
+		$this->clearCount();
 	}
 	
 	/**
@@ -304,6 +308,9 @@ class VariableGroupField extends CompositeField{
 	
 	
 	//TODO: maybe override the setValue function that is used in form->loadDataFrom ???
+	/**
+	 *  Load data from dataobjectset capability
+	 * **/
 	function loadDataFrom(DataObjectSet $dos){
 		
 		$iterator = $dos->getIterator();
