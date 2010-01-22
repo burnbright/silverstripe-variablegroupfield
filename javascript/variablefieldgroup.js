@@ -39,7 +39,10 @@
 						group.prepend($(data).hide());
 					}
 					group.find('div.loadingimage').hide();
-					group.find('> .CompositeField:last').slideDown();					
+					
+					group.trigger('addedSucccess');
+					
+					group.find('> .CompositeField:last').slideDown();
 				}
 			});
 			return false;

@@ -158,7 +158,7 @@ class VariableGroupField extends CompositeField{
 	 * Increase the init count. Returns new field group if ajax.
 	 */
 	function add(){
-		
+		$this->groupcount++;
 		$this->setCount($this->groupcount);
 		if(Controller::isAjax() || true){		
 			return $this->generateFieldGroup($this->groupcount)->fieldHolder();
@@ -334,6 +334,17 @@ class VariableGroupField extends CompositeField{
 			
 		}
 		
+	}
+	
+	function getRequiredFields(array $fieldnames){
+		$returnarray = array();
+		
+		for($i = 1; $i <= $this->groupcount ; $i++){
+			foreach($fieldnames as $name){
+				array_push($returnarray,$name.'_'.$i);
+			}
+		}
+		return $returnarray;		
 	}
 	
 	
