@@ -19,6 +19,9 @@ class VariableGroupField extends CompositeField{
 	
 	protected $singularitem = null;
 	
+	protected $addlabel = null;
+	protected $removelabel = null;
+	
 	/**
 	 * The constructor will generate $groupcount number of field groups.
 	 * 
@@ -94,6 +97,12 @@ class VariableGroupField extends CompositeField{
 		$this->singularitem = $s;
 	}
 	
+	function setAddRemoveLabels($add = null, $remove = null ){
+		$this->addlabel = $add;
+		$this->removelabel = $remove;
+	}
+	
+	
 	/**
 	 * Choose to not write on save. Might be useful if you just want to use the dataobject output.
 	 */
@@ -136,8 +145,12 @@ class VariableGroupField extends CompositeField{
 			$content .= "<div class='loadingimage' style='display:none;'><img src='".$this->loadingimageurl."' /></div>";
 		}
 		$itemname = ($this->singularitem)? " ".$this->singularitem:"";
-		$content .= "<a href=\"".$this->AddLink()."\" class=\"addlink\" >+ add$itemname</a>\n";
-		$content .= "<a href=\"".$this->RemoveLink()."\" class=\"removelink\" />- remove$itemname</a>\n";
+		
+		$addlabel = ($this->addlabel) ?  $this->addlabel:"+ add";
+		$removelabel = ($this->removelabel) ?  $this->removelabel:"- remove";
+		
+		$content .= "<a href=\"".$this->AddLink()."\" class=\"addlink\" >$addlabel</a>\n";
+		$content .= "<a href=\"".$this->RemoveLink()."\" class=\"removelink\" />$removelabel</a>\n";
 		$content .= "</div></div>\n";
 		return $content;
 	}
