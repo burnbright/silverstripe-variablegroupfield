@@ -140,18 +140,21 @@ class VariableGroupField extends CompositeField{
 				$content .= "\n" . $subfield->FieldHolder() . "\n";
 			}
 		}
-		$content .= "<div class=\"bottomcontrols\">";
-		if($this->loadingimageurl){
-			$content .= "<div class='loadingimage' style='display:none;'><img src='".$this->loadingimageurl."' /></div>";
+		if(!$this->readonly){
+			$content .= "<div class=\"bottomcontrols\">";
+			if($this->loadingimageurl){
+				$content .= "<div class='loadingimage' style='display:none;'><img src='".$this->loadingimageurl."' /></div>";
+			}
+			$itemname = ($this->singularitem)? " ".$this->singularitem:"";
+			
+			$addlabel = ($this->addlabel) ?  $this->addlabel:"+ add";
+			$removelabel = ($this->removelabel) ?  $this->removelabel:"- remove";
+			
+			$content .= "<a href=\"".$this->AddLink()."\" class=\"addlink\" >$addlabel</a>\n";
+			$content .= "<a href=\"".$this->RemoveLink()."\" class=\"removelink\" />$removelabel</a>\n";
+			$content .= "</div>\n";
 		}
-		$itemname = ($this->singularitem)? " ".$this->singularitem:"";
-		
-		$addlabel = ($this->addlabel) ?  $this->addlabel:"+ add";
-		$removelabel = ($this->removelabel) ?  $this->removelabel:"- remove";
-		
-		$content .= "<a href=\"".$this->AddLink()."\" class=\"addlink\" >$addlabel</a>\n";
-		$content .= "<a href=\"".$this->RemoveLink()."\" class=\"removelink\" />$removelabel</a>\n";
-		$content .= "</div></div>\n";
+		$content .= "</div>\n";
 		return $content;
 	}
 	
