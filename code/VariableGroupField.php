@@ -304,10 +304,14 @@ class VariableGroupField extends CompositeField{
 	/**
 	 * Returns data as a DataObjectSet (very similar to saveInto)
 	 */
+	 
+	 //TODO: optionally write new dataobjects to DB
 	function getDataObjectSet(){
 		$dos = new DataObjectSet();
-		foreach($this->FieldSet() as $compositefield){
+		$count = 1;
+		foreach(unserialize(serialize($this->FieldSet())) as $compositefield){
 			$dataobject = new DataObject();
+			$dataobject->FieldName = $compositefield->Name();
 			foreach($compositefield->FieldSet() as $field){
 				$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name
 				if($field->hasData()){
