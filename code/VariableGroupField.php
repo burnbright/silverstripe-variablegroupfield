@@ -75,7 +75,7 @@ class VariableGroupField extends CompositeField{
 	 * Set the initial count of groups to show
 	 */
 	function setCount($count = null){
-		if($count && $count > 0){
+		if($count && $count >= 0){
 			$this->groupcount = $count;
 			Session::set($this->name."_groupcount",$this->groupcount);
 		}
