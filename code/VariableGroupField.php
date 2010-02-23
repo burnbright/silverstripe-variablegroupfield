@@ -22,6 +22,8 @@ class VariableGroupField extends CompositeField{
 	protected $addlabel = null;
 	protected $removelabel = null;
 	
+	static $clearonsave = true;
+	
 	/**
 	 * The constructor will generate $groupcount number of field groups.
 	 * 
@@ -82,8 +84,10 @@ class VariableGroupField extends CompositeField{
 	}
 	
 	function clearCount(){
-		Session::clear($this->name."_groupcount");
-		$this->groupcount = 1;
+		if(self::$clearonsave){
+			Session::clear($this->name."_groupcount");
+			$this->groupcount = 1;
+		}
 	}
 	
 	/**
@@ -102,6 +106,9 @@ class VariableGroupField extends CompositeField{
 		$this->removelabel = $remove;
 	}
 	
+	function setDisableClearOnSave($clear = false){
+		self::$clearonsave = $clear;
+	}
 	
 	/**
 	 * Choose to not write on save. Might be useful if you just want to use the dataobject output.
