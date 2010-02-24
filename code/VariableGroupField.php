@@ -283,7 +283,7 @@ class VariableGroupField extends CompositeField{
 						$this->recursiveSaveInto($field,$dataobject); //save into composite sub-fields
 					}
 				}
-				$dataobject->{$record->class."ID"} = $record->ID;
+				$dataobject->{$record->class."ID"} = $record->ID;				
 				if($record->ID && $this->writeonsave){ //writing new dataobjects can be disabled.
 					$dataobject->write();
 				}
