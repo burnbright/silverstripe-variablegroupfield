@@ -313,11 +313,11 @@ class VariableGroupField extends CompositeField{
 	 */
 	 
 	 //TODO: optionally write new dataobjects to DB
-	function getDataObjectSet(){
+	function getDataObjectSet($class = 'DataObject', $write = false){
 		$dos = new DataObjectSet();
 		$count = 1;
 		foreach(unserialize(serialize($this->FieldSet())) as $compositefield){
-			$dataobject = new DataObject();
+			$dataobject = new $class();
 			$dataobject->FieldName = $compositefield->Name();
 			foreach($compositefield->FieldSet() as $field){
 				$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name
