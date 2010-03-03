@@ -77,7 +77,7 @@ class VariableGroupField extends CompositeField{
 	 * Set the initial count of groups to show
 	 */
 	function setCount($count = null){
-		if($count && $count >= 0){
+		if(is_numeric($count) && $count >= 0){
 			$this->groupcount = $count;
 			Session::set($this->name."_groupcount",$this->groupcount);
 		}
@@ -173,10 +173,6 @@ class VariableGroupField extends CompositeField{
 		return $this->Link() . "/remove";
 	}
 	
-	function test($data = null, $form = null){
-		return "test";
-	}
-	
 	/**
 	 * Increase the init count. Returns new field group if ajax.
 	 */
@@ -196,12 +192,15 @@ class VariableGroupField extends CompositeField{
 	 * Decrease the init count.
 	 */
 	function remove(){
-		if($this->groupcount > 0){
+		if($this->groupcount >= 0){
 			$this->groupcount--;
 			$this->setCount($this->groupcount);
 		}
+		if(Controller::isAjax() || true){		
+			return 'removed';
+		}		
 		Director::redirectBack();
-		return 'remove';
+		return 'removed';
 	}
 	
 	/**
@@ -234,9 +233,7 @@ class VariableGroupField extends CompositeField{
 				$this->modifyComposite($i,$subfield);
 			}
 		}
-		
 		$newfields->setName($this->name."_group_".$i);
-		
 		return $newfields;
 	}
 	
@@ -283,15 +280,16 @@ class VariableGroupField extends CompositeField{
 						$this->recursiveSaveInto($field,$dataobject); //save into composite sub-fields
 					}
 				}
-				$dataobject->{$record->class."ID"} = $record->ID;				
+				$dataobject->{$record->class."ID"} = $record->ID;
+				//TODO: set ParentID also, or instead??
+							
 				if($record->ID && $this->writeonsave){ //writing new dataobjects can be disabled.
 					$dataobject->write();
 				}
 			}
 			
 		}
-		//clear session init count
-		$this->clearCount();
+		$this->clearCount(); //clear session init count
 	}
 	
 	/**
@@ -332,8 +330,6 @@ class VariableGroupField extends CompositeField{
 		return $dos;
 	}
 	
-	
-	
 	//TODO: maybe override the setValue function that is used in form->loadDataFrom ???
 	/**
 	 *  Load data from dataobjectset capability
@@ -365,7 +361,6 @@ class VariableGroupField extends CompositeField{
 	
 	function getRequiredFields(array $fieldnames){
 		$returnarray = array();
-		
 		for($i = 1; $i <= $this->groupcount ; $i++){
 			foreach($fieldnames as $name){
 				array_push($returnarray,$name.'_'.$i);
