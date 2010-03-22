@@ -25,7 +25,7 @@
 							var newname = name.substring(0,name.indexOf('_'));
 							var value = $(this).val();
 							
-							
+							//duplicate checkbox values
 							if($(this).attr('checked')){
 								group.find('> .CompositeField:last').find('.'+newname+':input').attr('checked',true);
 							}else{
@@ -39,9 +39,7 @@
 						group.prepend($(data).hide());
 					}
 					group.find('div.loadingimage').hide();
-					
 					group.trigger('addedSucccess');
-					
 					group.find('> .CompositeField:last').slideDown();
 				}
 			});

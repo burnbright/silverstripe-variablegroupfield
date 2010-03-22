@@ -179,7 +179,7 @@ class VariableGroupField extends CompositeField{
 	function add(){
 		$this->groupcount++;
 		$this->setCount($this->groupcount);
-		if(Controller::isAjax() || true){		
+		if(Controller::isAjax()){		
 			return $this->generateFieldGroup($this->groupcount)->fieldHolder();
 		}
 		//TODO: save form data to be loaded again? (for non-javascript implementations)
@@ -196,7 +196,7 @@ class VariableGroupField extends CompositeField{
 			$this->groupcount--;
 			$this->setCount($this->groupcount);
 		}
-		if(Controller::isAjax() || true){		
+		if(Controller::isAjax()){		
 			return 'removed';
 		}		
 		Director::redirectBack();
