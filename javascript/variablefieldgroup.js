@@ -4,7 +4,7 @@
 		
 		var group = $(this);
 		
-		$(this).find(".addlink").click(function(){			
+		group.find(".addlink").click(function(){			
 			jQuery.ajax({
 				type: "GET",
 				url: $(this).attr('href'),
@@ -41,12 +41,18 @@
 					group.find('div.loadingimage').hide();
 					group.trigger('addedSucccess');
 					group.find('> .CompositeField:last').slideDown();
+					
+					group.find(".removelink").show();
 				}
 			});
 			return false;
 		});
+		
+		if(group.find('> .CompositeField').size() <= 0){
+			group.find(".removelink").hide();	
+		}
 	
-		$(this).find(".removelink").click(function(){
+		group.find(".removelink").click(function(){
 			//if(group.find('.CompositeField').size() > 1){
 				jQuery.ajax({
 					type: "GET",
@@ -58,6 +64,9 @@
 					success: function(data){
 						group.find('> .CompositeField:last').slideUp(600,function(){$(this).remove();});
 						group.find('div.loadingimage').hide();
+						if(group.find('> .CompositeField').size() < 2){
+							group.find(".removelink").hide();
+						}
 					}
 				});
 			//}
