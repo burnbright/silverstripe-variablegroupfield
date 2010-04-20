@@ -280,7 +280,7 @@ class VariableGroupField extends CompositeField{
 						$this->recursiveSaveInto($field,$dataobject); //save into composite sub-fields
 					}
 				}
-				$dataobject->{$record->class."ID"} = $record->ID;
+				$dataobject->{$record->class."ID"} = $record->ID; //relate new dataobjects to parent
 				//TODO: set ParentID also, or instead??
 							
 				if($record->ID && $this->writeonsave){ //writing new dataobjects can be disabled.
@@ -308,10 +308,11 @@ class VariableGroupField extends CompositeField{
 
 	/**
 	 * Returns data as a DataObjectSet (very similar to saveInto)
+	 * 
+	 * Write - choose whether to write new dataobjects to database
+	 * Parent - set the parent of the new dataobjects
 	 */
-	 
-	 //TODO: optionally write new dataobjects to DB
-	function getDataObjectSet($class = 'DataObject', $write = false){
+	function getDataObjectSet($class = 'DataObject', $write = false, $parent = null){
 		$dos = new DataObjectSet();
 		$count = 1;
 		foreach(unserialize(serialize($this->FieldSet())) as $compositefield){
@@ -326,6 +327,8 @@ class VariableGroupField extends CompositeField{
 				}
 			}
 			$dos->push($dataobject);
+			if($parent)
+				$dataobject->{$parent->class."ID"} = $parent->ID;
 		}
 		return $dos;
 	}
