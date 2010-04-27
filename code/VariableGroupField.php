@@ -22,7 +22,7 @@ class VariableGroupField extends CompositeField{
 	protected $addlabel = null;
 	protected $removelabel = null;
 	
-	static $clearonsave = true;
+	protected $clearonsave = true;
 	
 	/**
 	 * The constructor will generate $groupcount number of field groups.
@@ -84,10 +84,8 @@ class VariableGroupField extends CompositeField{
 	}
 	
 	function clearCount(){
-		if(self::$clearonsave){
-			Session::clear($this->name."_groupcount");
-			$this->groupcount = 1;
-		}
+		Session::clear($this->name."_groupcount");
+		$this->groupcount = 1;
 	}
 	
 	/**
@@ -106,8 +104,8 @@ class VariableGroupField extends CompositeField{
 		$this->removelabel = $remove;
 	}
 	
-	function setDisableClearOnSave($clear = false){
-		self::$clearonsave = $clear;
+	function disableClearOnSave($clear = false){
+		$this->clearonsave = $clear;
 	}
 	
 	/**
@@ -267,9 +265,8 @@ class VariableGroupField extends CompositeField{
 	 * Allows saving groups into new dataobjects.
 	 * The dataobject type is worked out from $this->name and the record's db array.
 	 */
-	function saveInto(DataObjectInterface $record) {
-		if($this->name) {
-			$class = $record->has_many($this->name);
+	function saveInto(DataObjectInterface $record, $clear = true) {
+		if($record && $this->name && $class = $record->has_many($this->name)) {
 			foreach($this->FieldSet() as $compositefield){
 				$dataobject = new $class();
 				foreach($compositefield->FieldSet() as $field){
@@ -289,7 +286,9 @@ class VariableGroupField extends CompositeField{
 			}
 			
 		}
-		$this->clearCount(); //clear session init count
+		if($this->clearonsave){//clear session init count
+			$this->clearCount();
+		}
 	}
 	
 	/**
