@@ -125,7 +125,6 @@ class VariableGroupField extends CompositeField{
 	//override the CompositeField hasData function
 	function hasData() { return true; }
 	
-	
 	/**
 	 * Renders the field with the additional controls
 	 */
@@ -283,17 +282,18 @@ class VariableGroupField extends CompositeField{
 				//$setids = array();
 				//create dataobjects
 				$set = $this->getDataObjectSet($class,true);
-
+				
 				//Set relationship on record
 				$saveDest = $record->{$this->name}();
 				if(! $saveDest)
-					
+					user_error("No appropriate class could be found for $this->name on $record->class.", E_USER_ERROR);
 				$saveDest->addMany($set);
 				
 			}else{
 				//throwing an error may break saving the filed when we don't want it to break
 				//user_error("No appropriate class could be found for $this->name on $record->class.", E_USER_ERROR);
 			}
+
 		}
 		
 		if($this->clearonsave){//clear session init count
@@ -311,16 +311,19 @@ class VariableGroupField extends CompositeField{
 	function getDataObjectSet($class = 'DataObject', $write = false, $parent = null){
 		$dos = new DataObjectSet();
 		$count = 1;
-		foreach(unserialize(serialize($this->FieldSet())) as $compositefield){
+		foreach($this->FieldSet() as $compositefield){
 			$dataobject = new $class();
+			$dataobject->write(); //get an id if necessary
 			$dataobject->FieldName = $compositefield->Name();
 			foreach($compositefield->FieldSet() as $field){
 				$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name
 				if($field->hasData()){
 					$field->saveInto($dataobject);
+					//echo "called saveInto on $dataobject->class $dataobject->ID from $field->class ".$field->Name();
 				}elseif($field->isComposite()){
 					$this->recursiveSaveInto($field,$dataobject); //save into composite sub-fields
 				}
+				//if($write) $dataobject->write();
 			}
 			$dos->push($dataobject);
 			if($parent)
