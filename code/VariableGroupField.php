@@ -264,52 +264,49 @@ class VariableGroupField extends CompositeField{
 	/**
 	 * Allows saving groups into new dataobjects.
 	 * The dataobject type is worked out from $this->name and the record's db array.
+	 * @param $record - the record to relate new dataobjects to.
+	 * @param $clear - clear the session group count on save.
 	 */
 	function saveInto(DataObjectInterface $record, $clear = true) {
-		if($record && $this->name && $class = $record->has_many($this->name)) {
-			foreach($this->FieldSet() as $compositefield){
-				$dataobject = new $class();
-				foreach($compositefield->FieldSet() as $field){
-					$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name
-					if($field->hasData()){
-						$field->saveInto($dataobject);
-					}elseif($field->isComposite()){
-						$this->recursiveSaveInto($field,$dataobject); //save into composite sub-fields
-					}
-				}
-				$dataobject->{$record->class."ID"} = $record->ID; //relate new dataobjects to parent
-				//TODO: set ParentID also, or instead??
-							
-				if($record->ID && $this->writeonsave){ //writing new dataobjects can be disabled.
-					$dataobject->write();
-				}
-			}
+		if($record && $this->name && $this->writeonsave){
 			
+			//TODO: there is probably a nicer way to get the class name
+			//find out the class name 
+			$has_many = $record->get_static($record->class,'has_many');	
+			$many_many = $record->get_static($record->class,'many_many');
+			$belongs_many_many = $record->get_static($record->class,'belongs_many_many');
+			$class = (isset($has_many[$this->name])) ? $has_many[$this->name] : null;
+			$class = (isset($belongs_many_many[$this->name])) ? $belongs_many_many[$this->name] : $class;
+			$class = (isset($many_many[$this->name])) ? $many_many[$this->name] : $class;
+			
+			if($class && $record->ID){
+				//$setids = array();
+				//create dataobjects
+				$set = $this->getDataObjectSet($class,true);
+
+				//Set relationship on record
+				$saveDest = $record->{$this->name}();
+				if(! $saveDest)
+					
+				$saveDest->addMany($set);
+				
+			}else{
+				//throwing an error may break saving the filed when we don't want it to break
+				//user_error("No appropriate class could be found for $this->name on $record->class.", E_USER_ERROR);
+			}
 		}
+		
 		if($this->clearonsave){//clear session init count
 			$this->clearCount();
-		}
-	}
-	
-	/**
-	 * Helper method for saving data that is in child fields of composite fields.
-	 */
-	function recursiveSaveInto($compositefield,&$dataobject){
-		foreach($compositefield->getChildren() as $field){
-			$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name			
-			if($field->hasData()){
-				$field->saveInto($dataobject);
-			}elseif($field->isComposite()){
-				$this->recursiveSaveInto($field,$dataobject); //save into composite subfields
-			}	
 		}
 	}
 
 	/**
 	 * Returns data as a DataObjectSet (very similar to saveInto)
 	 * 
-	 * Write - choose whether to write new dataobjects to database
-	 * Parent - set the parent of the new dataobjects
+	 * @param $class - the class of the DataObject to create & save into.
+	 * @param $write - choose whether to write new dataobjects to database
+	 * @param $parent - set the parent of the new dataobjects
 	 */
 	function getDataObjectSet($class = 'DataObject', $write = false, $parent = null){
 		$dos = new DataObjectSet();
@@ -330,6 +327,20 @@ class VariableGroupField extends CompositeField{
 				$dataobject->{$parent->class."ID"} = $parent->ID;
 		}
 		return $dos;
+	}
+	
+	/**
+	 * Helper method for saving data that is in child fields of composite fields.
+	 */
+	function recursiveSaveInto($compositefield,&$dataobject){
+		foreach($compositefield->getChildren() as $field){
+			$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name			
+			if($field->hasData()){
+				$field->saveInto($dataobject);
+			}elseif($field->isComposite()){
+				$this->recursiveSaveInto($field,$dataobject); //save into composite subfields
+			}	
+		}
 	}
 	
 	//TODO: maybe override the setValue function that is used in form->loadDataFrom ???
@@ -356,11 +367,12 @@ class VariableGroupField extends CompositeField{
 				$fieldgroup->FieldSet()->setValues($data);
 				$iterator->next();
 			}
-			
 		}
-		
 	}
 	
+	/**
+	 * Return a generated array of required fields base on field names. Eg: name will return name_1, name_2
+	 */
 	function getRequiredFields(array $fieldnames){
 		$returnarray = array();
 		for($i = 1; $i <= $this->groupcount ; $i++){
