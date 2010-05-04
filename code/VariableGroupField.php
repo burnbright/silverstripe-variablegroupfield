@@ -313,7 +313,7 @@ class VariableGroupField extends CompositeField{
 		$count = 1;
 		foreach($this->FieldSet() as $compositefield){
 			$dataobject = new $class();
-			$dataobject->write(); //get an id if necessary
+			if($write) $dataobject->write(); //get an id if necessary
 			$dataobject->FieldName = $compositefield->Name();
 			foreach($compositefield->FieldSet() as $field){
 				$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name
@@ -323,7 +323,7 @@ class VariableGroupField extends CompositeField{
 				}elseif($field->isComposite()){
 					$this->recursiveSaveInto($field,$dataobject); //save into composite sub-fields
 				}
-				//if($write) $dataobject->write();
+				if($write) $dataobject->write();
 			}
 			$dos->push($dataobject);
 			if($parent)
