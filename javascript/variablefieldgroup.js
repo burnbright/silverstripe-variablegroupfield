@@ -1,13 +1,84 @@
 (function($){
 	
-	jQuery(".VariableGroup").each(function(){
+	$.fn.variablegroupfield = function(options){
 		
-		var group = $(this);
+		var vgf = this;
 		
-		group.find(".addlink").click(function(){			
+		var defaults = {
+				
+		}
+		
+		var options = $.extend(defaults, options);
+		
+		/**
+		 * Sets up all the events for each variable group field
+		 */	
+		this.initialize = function() {
+			
+			this.each(function(){
+				
+				var group = $(this);
+				
+				//make sure we only ever initialize the group once
+				if(group.data('init') == true){
+					return;
+				}else{
+					group.data('init',true);
+				}
+				
+				group.find(".addlink").click(function(){
+					addsetto(group);
+					return false; //don't let the link execute
+				});
+				
+				group.find(".removelink").click(function(){
+					removesetfrom(group);
+					return false; //don't let the link execute
+				});
+				
+				//hide remove link if there are no composite sets
+				if(group.find('> .CompositeField').size() <= 0){
+					group.find(".removelink").hide();
+				}
+				
+			});
+			
+			return this;
+	    };
+		
+		
+	    /**
+	     * Public functions
+	     */
+	    //add a set to all groups
+		this.addset = function(){
+			vgf.each(function(){
+				addsetto($(this));
+			});
+		}
+		
+		//remove a set from groups
+		this.removeset = function(){
+			vgf.each(function(){
+				removesetfrom($(this));
+			});
+		}
+		
+		//remove all sets from all groups
+		this.removeall = function(){
+			vgf.each(function(){
+				removesetfrom($(this),-1);
+			});
+		}
+		
+		/***
+		 * Private functions
+		 */
+		
+		var addsetto = function(group){				
 			jQuery.ajax({
 				type: "GET",
-				url: $(this).attr('href'),
+				url: group.find('.addlink').attr('href'), //get place to send request
 				dataType: "html",
 				beforeSend: function(){
 					group.find('div.loadingimage').show();
@@ -32,7 +103,6 @@
 								group.find('> .CompositeField:last').find('.'+newname+':input').val(value);
 							}
 							//TODO: make this work with radio buttons & dropdowns etc
-							
 						});
 						
 					}else{
@@ -45,35 +115,48 @@
 					group.find(".removelink").show();
 				}
 			});
-			return false;
-		});
-		
-		if(group.find('> .CompositeField').size() <= 0){
-			group.find(".removelink").hide();	
 		}
-	
-		group.find(".removelink").click(function(){
-			//if(group.find('.CompositeField').size() > 1){
-				jQuery.ajax({
-					type: "GET",
-					url: $(this).attr('href'),
-					dataType: "html",
-					beforeSend: function(){
-						group.find('div.loadingimage').show();
-					},
-					success: function(data){
-						group.find('> .CompositeField:last').slideUp(600,function(){$(this).remove();});
-						group.find('div.loadingimage').hide();
-						if(group.find('> .CompositeField').size() < 2){
+		
+		/*
+		 * Remove set from group
+		 * group - the group to remove from
+		 * count - the number of sets to remove
+		 * 
+		 */
+		var removesetfrom = function(group, count){
+			
+			var removeurl = group.find('.removelink').attr('href');
+			
+			var countstr = ':last';
+			
+			if(count == -1){
+				countstr = '';
+				removeurl += 'all'; //modify the url
+			}
+				
+			jQuery.ajax({
+				type: "GET",
+				url: removeurl,
+				dataType: "html",
+				beforeSend: function(){
+					group.find('div.loadingimage').show();
+				},
+				success: function(data){
+					group.find('> .CompositeField'+countstr).slideUp(600,function(){
+						$(this).remove();
+						if(group.find('> .CompositeField').size() < 1){
 							group.find(".removelink").hide();
 						}
-					}
-				});
-			//}
-			return false;
-		});
-	
-	});
-	
+					
+					});
+					group.find('div.loadingimage').hide();
+				}
+			});
+			
+		}
+		
+		return this.initialize();	
+	}
+
 	
 })(jQuery);

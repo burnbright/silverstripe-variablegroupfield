@@ -91,7 +91,8 @@ class VariableGroupField extends CompositeField{
 	 * Set the initial count of groups to show
 	 */
 	function setCount($count = null){
-		if(is_numeric($count) && $count >= 0){
+		if(is_numeric($count)){
+			if($count <= 0) $count = 0;
 			$this->groupcount = $count;
 			Session::set($this->name."_groupcount",$this->groupcount);
 		}
@@ -204,13 +205,16 @@ class VariableGroupField extends CompositeField{
 	 */
 	function remove(){
 		if($this->groupcount >= 0){
-			$this->groupcount--;
+			$this->groupcount --;
 			$this->setCount($this->groupcount);
 		}
-		if(Controller::isAjax()){		
-			return 'removed';
-		}		
-		Director::redirectBack();
+		if(!Controller::isAjax()){Director::redirectBack();}
+		return 'removed';
+	}
+	
+	function removeall(){
+		$this->setCount(0);
+		if(!Controller::isAjax()){Director::redirectBack();}
 		return 'removed';
 	}
 	
