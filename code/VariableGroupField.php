@@ -64,6 +64,20 @@ class VariableGroupField extends CompositeField{
 		$this->generateFields();
 		
 		Requirements::javascript('variablegroupfield/javascript/variablefieldgroup.js');
+		/*
+		Debug::backtrace();
+		
+		
+		foreach($this->children as $child){
+			echo $child->Name();
+			foreach($child->getChildren() as $field){
+				echo $field->Name();
+			}
+		}
+		
+		Debug::show('Constructed');
+		Debug::show($this->children);
+		*/
 	}
 	
 	/**
@@ -216,7 +230,7 @@ class VariableGroupField extends CompositeField{
 	 */
 	
 	function generateFieldGroup($i){
-		$newfields = new CompositeField( unserialize(serialize($this->originalchildren)));
+		$newfields = new CompositeField(unserialize(serialize($this->originalchildren)));
 		foreach($newfields->FieldSet() as $subfield){
 			$subfield->addExtraClass($subfield->Name());
 			if($this->showfieldscount){
@@ -315,7 +329,8 @@ class VariableGroupField extends CompositeField{
 			$dataobject = new $class();
 			if($write) $dataobject->write(); //get an id if necessary
 			$dataobject->FieldName = $compositefield->Name();
-			foreach($compositefield->FieldSet() as $field){
+			$fields = unserialize(serialize($compositefield->getChildren())); //deep copy so we're not changing the origional field
+			foreach($fields as $field){
 				$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name
 				if($field->hasData()){
 					$field->saveInto($dataobject);
@@ -336,7 +351,8 @@ class VariableGroupField extends CompositeField{
 	 * Helper method for saving data that is in child fields of composite fields.
 	 */
 	function recursiveSaveInto($compositefield,&$dataobject){
-		foreach($compositefield->getChildren() as $field){
+		$fields = unserialize(serialize($compositefield->getChildren())); //deep copy so we're not changing the origional field
+		foreach($fields as $field){
 			$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name			
 			if($field->hasData()){
 				$field->saveInto($dataobject);
