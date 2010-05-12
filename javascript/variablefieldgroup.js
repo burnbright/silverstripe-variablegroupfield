@@ -75,7 +75,8 @@
 		 * Private functions
 		 */
 		
-		var addsetto = function(group){				
+		var addsetto = function(group){
+			//TODO: trigger event for external manipulation
 			jQuery.ajax({
 				type: "GET",
 				url: group.find('.addlink').attr('href'), //get place to send request
@@ -124,6 +125,7 @@
 		 * 
 		 */
 		var removesetfrom = function(group, count){
+			//TODO: trigger event for external manipulation
 			
 			var removeurl = group.find('.removelink').attr('href');
 			
@@ -158,5 +160,6 @@
 		return this.initialize();	
 	}
 
+	var vgf = $(".VariableGroup").variablegroupfield(); //TODO: replace with generated custom code for specific options
 	
 })(jQuery);
