@@ -24,6 +24,9 @@ class VariableGroupField extends CompositeField{
 	
 	protected $clearonsave = true;
 	
+	//callback called when DataObjectSet is created
+	protected $callbackobj = null; protected $callbackfn = null;
+	
 	/**
 	 * The constructor will generate $groupcount number of field groups.
 	 * 
@@ -64,20 +67,6 @@ class VariableGroupField extends CompositeField{
 		$this->generateFields();
 		
 		Requirements::javascript('variablegroupfield/javascript/variablefieldgroup.js');
-		/*
-		Debug::backtrace();
-		
-		
-		foreach($this->children as $child){
-			echo $child->Name();
-			foreach($child->getChildren() as $field){
-				echo $field->Name();
-			}
-		}
-		
-		Debug::show('Constructed');
-		Debug::show($this->children);
-		*/
 	}
 	
 	/**
@@ -135,6 +124,11 @@ class VariableGroupField extends CompositeField{
 	 */
 	function setFieldsToDuplicate(array $fields){
 		$this->fieldstoduplicate = $fields;
+	}
+	
+	function setCallback($obj,$fn){
+		$this->callbackfn = $fn;
+		$this->callbackobj = $obj;
 	}
 	
 	//override the CompositeField hasData function
@@ -344,6 +338,11 @@ class VariableGroupField extends CompositeField{
 				}
 				if($write) $dataobject->write();
 			}
+			
+			//call back
+			if($this->callbackobj && $this->callbackfn)
+				call_user_func(array($this->callbackobj,$this->callbackfn),&$dataobject,$fields);
+				
 			$dos->push($dataobject);
 			if($parent)
 				$dataobject->{$parent->class."ID"} = $parent->ID;
@@ -404,6 +403,10 @@ class VariableGroupField extends CompositeField{
 			}
 		}
 		return $returnarray;		
+	}
+	
+	function removeByName($name){
+		$this->originalchildren->removeByName($name);
 	}
 	
 	
