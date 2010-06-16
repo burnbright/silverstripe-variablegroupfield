@@ -76,6 +76,14 @@ class VariableGroupField extends CompositeField{
 		$this->originalchildren->push($field);
 	}
 	
+	function removeByName($name){
+		$this->originalchildren->removeByName($name);
+	}
+	
+	function insertBefore($item,$name){
+		$this->originalchildren->insertBefore($item,$name);
+	}
+	
 	/**
 	 * Set the initial count of groups to show
 	 */
@@ -339,13 +347,14 @@ class VariableGroupField extends CompositeField{
 				if($write) $dataobject->write();
 			}
 			
+			if($parent)
+				$dataobject->{$parent->class."ID"} = $parent->ID;
+			
 			//call back
 			if($this->callbackobj && $this->callbackfn)
 				call_user_func(array($this->callbackobj,$this->callbackfn),&$dataobject,$fields);
 				
 			$dos->push($dataobject);
-			if($parent)
-				$dataobject->{$parent->class."ID"} = $parent->ID;
 		}
 		return $dos;
 	}
@@ -403,10 +412,6 @@ class VariableGroupField extends CompositeField{
 			}
 		}
 		return $returnarray;		
-	}
-	
-	function removeByName($name){
-		$this->originalchildren->removeByName($name);
 	}
 	
 	
