@@ -17,6 +17,7 @@ Future plans:
 * ensure the add/remove functionality works without javascript
 * choose which fields are automatically duplicated when 'add' is clicked
 * This idea could be scaled back to encompass has_one relationships, so that a group of fields can be saved into an associated DataObject.
+* Add min / maximum groups count and incorporate this into validation / javascript.
 
 Known flaws
 - you have to regenerate fields each time you make modifications
