@@ -12,6 +12,7 @@ class VariableGroupField extends CompositeField{
 	
 	//configuration options
 	protected $groupcount = 1;
+	protected $initcount = 1;
 	protected $showfieldscount = false;
 	protected $loadingimageurl = null;
 	protected $fieldstoduplicate = null;
@@ -36,7 +37,8 @@ class VariableGroupField extends CompositeField{
 		$args = func_get_args();
 		
 		$name = array_shift($args);
-		$groupcount = array_shift($args);
+		$groupcount = $initcount = array_shift($args);
+		
 		
 		if(!is_string($name)) user_error('TabSet::__construct(): $name parameter to a valid string', E_USER_ERROR);
 		$this->name = $name;
@@ -206,7 +208,7 @@ class VariableGroupField extends CompositeField{
 	 * Decrease the init count.
 	 */
 	function remove(){
-		if($this->groupcount >= 0){
+		if($this->groupcount >= $this->initcount){
 			$this->groupcount --;
 			$this->setCount($this->groupcount);
 		}
@@ -215,7 +217,7 @@ class VariableGroupField extends CompositeField{
 	}
 	
 	function removeall(){
-		$this->setCount(0);
+		$this->setCount($this->initcount);
 		if(!Controller::isAjax()){Director::redirectBack();}
 		return 'removed';
 	}
@@ -363,7 +365,8 @@ class VariableGroupField extends CompositeField{
 	 * Helper method for saving data that is in child fields of composite fields.
 	 */
 	function recursiveSaveInto($compositefield,&$dataobject){
-		$fields = unserialize(serialize($compositefield->getChildren())); //deep copy so we're not changing the origional field
+		//$fields = unserialize(serialize($compositefield->getChildren())); //deep copy so we're not changing the origional field
+		$fields = $compositefield->getChildren();
 		foreach($fields as $field){
 			$field->setName(substr($field->Name(),0,strpos($field->Name(),'_'))); //assumes underscores aren't used in a DB field name			
 			if($field->hasData()){
