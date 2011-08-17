@@ -170,8 +170,8 @@ class VariableGroupField extends CompositeField{
 			}
 			$itemname = ($this->singularitem)? " ".$this->singularitem:"";
 			
-			$addlabel = ($this->addlabel) ?  $this->addlabel:"+ add";
-			$removelabel = ($this->removelabel) ?  $this->removelabel:"- remove";
+			$addlabel = ($this->addlabel) ? $this->addlabel:_t("VariableGroupField.ADD","+ add");
+			$removelabel = ($this->removelabel) ? $this->removelabel:_t("VariableGroupField.REMOVE","- remove");
 			
 			$content .= "<a href=\"".$this->AddLink()."\" class=\"addlink\" >$addlabel</a>\n";
 			$content .= "<a href=\"".$this->RemoveLink()."\" class=\"removelink\" />$removelabel</a>\n";
