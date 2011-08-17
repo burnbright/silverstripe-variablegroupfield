@@ -23,3 +23,6 @@ Known flaws
 - you have to regenerate fields each time you make modifications
 - fields can still clash with other form fields (eg if you have a FirstName field in the rest of the form, and also in the vgf)
 - reliant on javascript, however you can still add groups etc..but they won't retian their data
+
+
+This field assumes it is acceptable to modify fields during data loading.
