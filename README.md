@@ -1,14 +1,19 @@
 Variable Group Field, by Jeremy Shipman <jeremy@burnbright.co.nz>
 
-The VariableGroupField allows specifying a group of fields once, and then provides the means to duplicate that FieldSet for multiple entries (similar to TableField). It also provides the means to automatically save it's subfields into a new DataObject that gets connected via a has_many relationship to the DataObject that was saved into .
+The VariableGroupField allows specifying a group of fields once, and then provides
+the means to duplicate that FieldSet for multiple entries (similar to TableField).
+It also provides the means to automatically save it's subfields into a new DataObject 
+that gets connected via a has_many relationship to the DataObject that was saved into .
 
-When the VariableFieldGroup constructor is called, it duplicates it's child fields X amount of times. I have functions for increasing and decreasing X. These can be called via ajax, and return the new extra fields.
+When the VariableFieldGroup constructor is called, it duplicates it's child fields X amount of times. 
+I have functions for increasing and decreasing X. These can be called via ajax, and return the new extra fields.
 The constructor also renames all the fields in the child groups to names like Title_1,Author_1.
 
 The VariableGroupField's save into method searches for a has_many field on the targeted DataObject,
 and saves a new instance of the has_many DataObject type, and links that new DataObject to the targeted one.
 
-As an alternative to TableField, the Variable Group Field puts more customisation control in the developer's hands. It might however be more visually clunky though when there are many entries involved.
+As an alternative to TableField, the Variable Group Field puts more customisation control in the developer's hands. 
+It might however be more visually clunky though when there are many entries involved.
 
 Future plans:
 * make it possible to remove specific groups
@@ -23,6 +28,6 @@ Known flaws
 - you have to regenerate fields each time you make modifications
 - fields can still clash with other form fields (eg if you have a FirstName field in the rest of the form, and also in the vgf)
 - reliant on javascript, however you can still add groups etc..but they won't retian their data
-
+- does not work with all field types
 
 This field assumes it is acceptable to modify fields during data loading.
