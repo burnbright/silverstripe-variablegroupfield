@@ -3,10 +3,7 @@
 	$.fn.variablegroupfield = function(options){
 		
 		var vgf = this;
-		
-		var defaults = {
-				
-		}
+		var defaults = {};
 		
 		var options = $.extend(defaults, options);
 		
@@ -45,8 +42,7 @@
 			
 			return this;
 	    };
-		
-		
+			
 	    /**
 	     * Public functions
 	     */
@@ -55,21 +51,21 @@
 			vgf.each(function(){
 				addsetto($(this));
 			});
-		}
+		};
 		
 		//remove a set from groups
 		this.removeset = function(){
 			vgf.each(function(){
 				removesetfrom($(this));
 			});
-		}
+		};
 		
 		//remove all sets from all groups
 		this.removeall = function(){
 			vgf.each(function(){
 				removesetfrom($(this),-1);
 			});
-		}
+		};
 		
 		/***
 		 * Private functions
@@ -116,7 +112,7 @@
 					group.find(".removelink").show();
 				}
 			});
-		}
+		};
 		
 		/*
 		 * Remove set from group
@@ -155,7 +151,7 @@
 				}
 			});
 			
-		}
+		};
 		
 		return this.initialize();	
 	}
