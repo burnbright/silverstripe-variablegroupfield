@@ -419,6 +419,9 @@ class VariableGroupField extends CompositeField{
 		return $returnarray;
 	}
 
+	function setChildren($children){
+		parent::setChildren($children);
+		$this->originalchildren = unserialize(serialize($this->children));
+	}
 
 }
-?>
