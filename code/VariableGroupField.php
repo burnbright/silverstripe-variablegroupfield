@@ -356,7 +356,7 @@ class VariableGroupField extends CompositeField{
 
 			//call back
 			if($this->callbackobj && $this->callbackfn)
-				call_user_func(array($this->callbackobj,$this->callbackfn),&$dataobject,$fields);
+				call_user_func(array($this->callbackobj,$this->callbackfn),$dataobject,$fields);
 
 			$dos->push($dataobject);
 		}
